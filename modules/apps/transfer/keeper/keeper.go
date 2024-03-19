@@ -46,12 +46,12 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
 	legacySubspace types.ParamSubspace,
-	ics4Wrapper porttypes.ICS4Wrapper,
-	channelKeeper types.ChannelKeeper,
-	portKeeper types.PortKeeper,
+	//ics4Wrapper porttypes.ICS4Wrapper,
+	//channelKeeper types.ChannelKeeper,
+	//portKeeper types.PortKeeper,
 	authKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	scopedKeeper exported.ScopedKeeper,
+	//scopedKeeper exported.ScopedKeeper,
 	authority string,
 ) Keeper {
 	// ensure ibc transfer module account is set
@@ -67,13 +67,13 @@ func NewKeeper(
 		cdc:            cdc,
 		storeKey:       key,
 		legacySubspace: legacySubspace,
-		ics4Wrapper:    ics4Wrapper,
-		channelKeeper:  channelKeeper,
-		portKeeper:     portKeeper,
-		authKeeper:     authKeeper,
-		bankKeeper:     bankKeeper,
-		scopedKeeper:   scopedKeeper,
-		authority:      authority,
+		//ics4Wrapper:    ics4Wrapper,
+		//channelKeeper:  channelKeeper,
+		//portKeeper:   portKeeper,
+		authKeeper: authKeeper,
+		bankKeeper: bankKeeper,
+		//scopedKeeper: scopedKeeper,
+		authority: authority,
 	}
 }
 
