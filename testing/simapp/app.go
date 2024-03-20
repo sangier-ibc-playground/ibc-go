@@ -121,7 +121,8 @@ import (
 	transfer "github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v8/modules/core"
+
+	//ibc "github.com/cosmos/ibc-go/v8/modules/core"
 
 	//ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
 	//ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
@@ -612,7 +613,7 @@ func NewSimApp(
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
 
 		// IBC modules
-		ibc.NewAppModule(app.IBCKeeper),
+		//ibc.NewAppModule(app.IBCKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		//ibcfee.NewAppModule(app.IBCFeeKeeper),
 		//ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
