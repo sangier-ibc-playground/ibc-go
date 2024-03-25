@@ -9,6 +9,8 @@ import (
 
 const (
 	// ModuleName defines the IBC transfer name
+	SubModuleName = "channel"
+
 	ModuleName = "transfer"
 
 	// Version defines the current version the IBC transfer

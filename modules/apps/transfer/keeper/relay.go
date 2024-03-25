@@ -141,9 +141,9 @@ func (k Keeper) sendTransfer(
 		return 0, err
 	}*/
 
-	ctx.EventManager().EmitEvent(
+	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.EventSendPacket, // Event type
+			types.EventTypeSendPacket, // Event type
 			//sdk.NewAttribute("context", ctx), ctx and channelCap must be provided by interceptor when forwarding the message
 			//sdk.NewAttribute("context", channelCap),
 			sdk.NewAttribute("source_port", sourcePort),
@@ -152,7 +152,11 @@ func (k Keeper) sendTransfer(
 			sdk.NewAttribute("timeout_timestamp", fmt.Sprintf("%d", timeoutTimestamp)),
 			sdk.NewAttribute("packet_data", string(packetData.GetBytes())), // Ensuring 'data' is serialized appropriately
 		),
-	)
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
+		),
+	})
 
 	defer func() {
 		if token.Amount.IsInt64() {

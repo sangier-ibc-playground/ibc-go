@@ -1,5 +1,11 @@
 package types
 
+import (
+	"fmt"
+
+	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+)
+
 // IBC transfer events
 const (
 	EventTypeTimeout           = "timeout"
@@ -7,7 +13,7 @@ const (
 	EventTypeTransfer          = "ibc_transfer"
 	EventTypeChannelClose      = "channel_closed"
 	EventTypeDenomTrace        = "denomination_trace"
-	EventSendPacket            = "send_packet"
+	EventTypeSendPacket        = "send_packet"
 	AttributeKeyPacketData     = "packet_data"
 	AttributeKeyReceiver       = "receiver"
 	AttributeKeyDenom          = "denom"
@@ -20,4 +26,8 @@ const (
 	AttributeKeyAckError       = "error"
 	AttributeKeyTraceHash      = "trace_hash"
 	AttributeKeyMemo           = "memo"
+)
+
+var (
+	AttributeValueCategory = fmt.Sprintf("%s_%s", ibcexported.ModuleName, SubModuleName)
 )
