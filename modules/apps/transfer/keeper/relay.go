@@ -134,10 +134,26 @@ func (k Keeper) sendTransfer(
 		fullDenomPath, token.Amount.String(), sender.String(), receiver, memo,
 	)
 
-	sequence, err := k.ics4Wrapper.SendPacket(ctx, channelCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, packetData.GetBytes())
+	// Commenting out SendPacket. We emit an event instead. The interceptor will then intercept the event,
+	// provide the ctx and ChannelCap, reconstruct the message and send the message to another host machine.
+
+	/*sequence, err := k.ics4Wrapper.SendPacket(ctx, channelCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, packetData.GetBytes())
 	if err != nil {
 		return 0, err
-	}
+	}*/
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventSendPacket, // Event type
+			//sdk.NewAttribute("context", ctx), ctx and channelCap must be provided by interceptor when forwarding the message
+			//sdk.NewAttribute("context", channelCap),
+			sdk.NewAttribute("source_port", sourcePort),
+			sdk.NewAttribute("source_channel", sourceChannel),
+			sdk.NewAttribute("timeout_height", timeoutHeight.String()),
+			sdk.NewAttribute("timeout_timestamp", fmt.Sprintf("%d", timeoutTimestamp)),
+			sdk.NewAttribute("packet_data", string(packetData.GetBytes())), // Ensuring 'data' is serialized appropriately
+		),
+	)
 
 	defer func() {
 		if token.Amount.IsInt64() {
