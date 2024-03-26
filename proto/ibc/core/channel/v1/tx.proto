@@ -33,6 +33,9 @@ service Msg {
   // MsgChannelCloseConfirm.
   rpc ChannelCloseConfirm(MsgChannelCloseConfirm) returns (MsgChannelCloseConfirmResponse);
 
+  // SendPacket defines a rpc handler method for MsgSendPacket.
+  rpc SendPacket(MsgSendPacket) returns (MsgSendPacketResponse);
+
   // RecvPacket defines a rpc handler method for MsgRecvPacket.
   rpc RecvPacket(MsgRecvPacket) returns (MsgRecvPacketResponse);
 
@@ -106,6 +109,8 @@ message MsgChannelOpenInitResponse {
   string channel_id = 1;
   string version    = 2;
 }
+
+// Roolkit fraud proof will be at application levels? 
 
 // MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel
 // on Chain B. The version field within the Channel field has been deprecated. Its
@@ -208,6 +213,7 @@ message MsgChannelCloseConfirm {
 // type.
 message MsgChannelCloseConfirmResponse {}
 
+
 // MsgRecvPacket receives incoming IBC packet
 message MsgRecvPacket {
   option (cosmos.msg.v1.signer) = "signer";
@@ -217,11 +223,32 @@ message MsgRecvPacket {
   Packet                    packet           = 1 [(gogoproto.nullable) = false];
   bytes                     proof_commitment = 2;
   ibc.core.client.v1.Height proof_height     = 3 [(gogoproto.nullable) = false];
-  string                    signer           = 4;
+  string signer           = 4;
 }
 
 // MsgRecvPacketResponse defines the Msg/RecvPacket response type.
 message MsgRecvPacketResponse {
+  option (gogoproto.goproto_getters) = false;
+
+  ResponseResultType result = 1;
+}
+
+ // MsgSendPacket receives incoming IBC packet
+message MsgSendPacket {
+  option (cosmos.msg.v1.signer) = "signer";
+
+  option (gogoproto.goproto_getters) = false;
+
+  string               sourcePort     = 1 ;
+  string            sourceChannel     = 2 ;
+  ibc.core.client.v1.Height             timeout_height=  3 [(gogoproto.nullable) = false];
+  uint64        timeoutTimestamp =  4 ;
+  Packet                    packet           = 5 [(gogoproto.nullable) = false];
+  string                    signer           = 6;
+}
+
+// MsgSendPacketResponse defines the Msg/SendPacket response type.
+message MsgSendPacketResponse {
   option (gogoproto.goproto_getters) = false;
 
   ResponseResultType result = 1;

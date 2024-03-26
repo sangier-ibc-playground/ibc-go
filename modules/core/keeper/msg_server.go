@@ -445,6 +445,36 @@ func (k Keeper) ChannelCloseConfirm(goCtx context.Context, msg *channeltypes.Msg
 	return &channeltypes.MsgChannelCloseConfirmResponse{}, nil
 }
 
+// SendPacket defines a rpc handler method for MsgSendPacket.
+// SendPacket defines a rpc handler method for MsgSendPacket.
+func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacket) (*channeltypes.MsgSendPacketResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Validate the signer's address
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "invalid address for msg signer"))
+		return nil, errorsmod.Wrap(err, "invalid address for msg signer")
+	}
+
+	// Lookup module by channel capability
+	_, channelCap, err := k.ChannelKeeper.LookupModuleByChannel(ctx, msg.Packet.DestinationPort, msg.Packet.DestinationChannel)
+	if err != nil {
+		ctx.Logger().Error("receive packet failed", "port-id", msg.Packet.SourcePort, "channel-id", msg.Packet.SourceChannel, "error", errorsmod.Wrap(err, "could not retrieve module from port-id"))
+		return nil, errorsmod.Wrap(err, "could not retrieve module from port-id")
+	}
+
+	// Call the SendPacket function of the ChannelKeeper
+	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.SourcePort, msg.SourceChannel, msg.TimeoutHeight, msg.TimeoutTimestamp, msg.Packet.GetData()); err != nil {
+		ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "error sending packet"))
+		return nil, errorsmod.Wrap(err, "error sending packet")
+	}
+
+	// Log success and return
+	ctx.Logger().Info("packet sent", "source-port", msg.Packet.SourcePort, "source-channel", msg.Packet.SourceChannel, "sequence", msg.Packet.Sequence)
+	return &channeltypes.MsgSendPacketResponse{}, nil
+}
+
 // RecvPacket defines a rpc handler method for MsgRecvPacket.
 func (k Keeper) RecvPacket(goCtx context.Context, msg *channeltypes.MsgRecvPacket) (*channeltypes.MsgRecvPacketResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

@@ -21,6 +21,7 @@ var (
 	_ sdk.Msg = (*MsgChannelOpenConfirm)(nil)
 	_ sdk.Msg = (*MsgChannelCloseInit)(nil)
 	_ sdk.Msg = (*MsgChannelCloseConfirm)(nil)
+	_ sdk.Msg = (*MsgSendPacket)(nil)
 	_ sdk.Msg = (*MsgRecvPacket)(nil)
 	_ sdk.Msg = (*MsgAcknowledgement)(nil)
 	_ sdk.Msg = (*MsgTimeout)(nil)
@@ -40,6 +41,7 @@ var (
 	_ sdk.HasValidateBasic = (*MsgChannelCloseInit)(nil)
 	_ sdk.HasValidateBasic = (*MsgChannelCloseConfirm)(nil)
 	_ sdk.HasValidateBasic = (*MsgRecvPacket)(nil)
+	_ sdk.HasValidateBasic = (*MsgSendPacket)(nil)
 	_ sdk.HasValidateBasic = (*MsgAcknowledgement)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeout)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeoutOnClose)(nil)
@@ -263,6 +265,39 @@ func (msg MsgChannelCloseConfirm) ValidateBasic() error {
 		return errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "string could not be parsed as address: %v", err)
 	}
 	return nil
+}
+
+func NewMsgSendPacket(
+	sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, packet Packet,
+	signer string,
+) *MsgSendPacket {
+	return &MsgSendPacket{
+		SourcePort:       sourcePort,
+		SourceChannel:    sourceChannel,
+		TimeoutHeight:    timeoutHeight,
+		TimeoutTimestamp: timeoutTimestamp,
+		Packet:           packet,
+		Signer:           signer,
+	}
+}
+
+// MsgSendPacket implements sdk.Msg
+func (msg MsgSendPacket) ValidateBasic() error {
+	//if len(msg.ProofCommitment) == 0 {
+	//	return errorsmod.Wrap(commitmenttypes.ErrInvalidProof, "cannot submit an empty commitment proof")
+	//}
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "string could not be parsed as address: %v", err)
+	}
+	return msg.Packet.ValidateBasic()
+}
+
+// GetDataSignBytes returns the base64-encoded bytes used for the
+// data field when signing the packet.
+func (msg MsgSendPacket) GetDataSignBytes() []byte {
+	s := "\"" + base64.StdEncoding.EncodeToString(msg.Packet.Data) + "\""
+	return []byte(s)
 }
 
 // NewMsgRecvPacket constructs new MsgRecvPacket
