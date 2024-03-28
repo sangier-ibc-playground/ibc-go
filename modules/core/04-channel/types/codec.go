@@ -15,7 +15,7 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterInterface(
 		"ibc.core.channel.v1.PacketI",
 		(*exported.PacketI)(nil),
-		&Packet{},
+		&Packet{}, &MsgSendPacket{},
 	)
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),

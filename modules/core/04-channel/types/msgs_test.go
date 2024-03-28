@@ -895,6 +895,41 @@ func (suite *TypesTestSuite) TestMsgRecvPacketGetSigners() {
 	suite.Require().Equal(expSigner.Bytes(), signers[0])
 }
 
+func (suite *TypesTestSuite) TestMsgSendPacketValidateBasic() {
+	testCases := []struct {
+		name   string
+		msg    *types.MsgSendPacket
+		expErr error
+	}{
+		{
+			"success",
+			types.NewMsgSendPacket("transfer", "channel-0", height, 100, packet, addr),
+			nil,
+		},
+		{
+			"missing signer address",
+			types.NewMsgSendPacket("transfer", "channel-0", height, 100, packet, ""),
+			errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "string could not be parsed as address: %v", errors.New("empty address string is not allowed")),
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		suite.Run(tc.name, func() {
+			err := tc.msg.ValidateBasic()
+
+			expPass := tc.expErr == nil
+			if expPass {
+				suite.NoError(err)
+			} else {
+				suite.Error(err)
+				suite.Require().Equal(err.Error(), tc.expErr.Error())
+			}
+		})
+	}
+}
+
 func (suite *TypesTestSuite) TestMsgTimeoutValidateBasic() {
 	testCases := []struct {
 		name   string
