@@ -26,7 +26,7 @@ func TestCodecTypeRegistration(t *testing.T) {
 		{
 			"success: SendPacket",
 			sdk.MsgTypeURL(&types.MsgSendPacket{}),
-			false,
+			true,
 		},
 		{
 			"success: MsgChannelOpenInit",

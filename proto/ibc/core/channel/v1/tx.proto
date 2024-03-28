@@ -233,7 +233,7 @@ message MsgRecvPacketResponse {
   ResponseResultType result = 1;
 }
 
- // MsgSendPacket receives incoming IBC packet
+ // MsgSendPacket process outgoing IBC packet
 message MsgSendPacket {
   option (cosmos.msg.v1.signer) = "signer";
 
