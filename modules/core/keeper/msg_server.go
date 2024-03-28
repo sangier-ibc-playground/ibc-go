@@ -446,7 +446,6 @@ func (k Keeper) ChannelCloseConfirm(goCtx context.Context, msg *channeltypes.Msg
 }
 
 // SendPacket defines a rpc handler method for MsgSendPacket.
-// SendPacket defines a rpc handler method for MsgSendPacket.
 func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacket) (*channeltypes.MsgSendPacketResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
