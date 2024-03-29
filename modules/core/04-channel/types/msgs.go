@@ -268,15 +268,15 @@ func (msg MsgChannelCloseConfirm) ValidateBasic() error {
 }
 
 func NewMsgSendPacket(
-	sourcePort string, sourceChannel string, timeoutHeight clienttypes.Height, timeoutTimestamp uint64, packet Packet,
+	source_port string, source_channel string, timeout_height clienttypes.Height, timeout_timestamp uint64, data []byte,
 	signer string,
 ) *MsgSendPacket {
 	return &MsgSendPacket{
-		SourcePort:       sourcePort,
-		SourceChannel:    sourceChannel,
-		TimeoutHeight:    timeoutHeight,
-		TimeoutTimestamp: timeoutTimestamp,
-		Packet:           packet,
+		SourcePort:       source_port,
+		SourceChannel:    source_channel,
+		TimeoutHeight:    timeout_height,
+		TimeoutTimestamp: timeout_timestamp,
+		PData:            data,
 		Signer:           signer,
 	}
 }

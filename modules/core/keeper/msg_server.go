@@ -457,14 +457,14 @@ func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacke
 	}
 
 	// Lookup module by channel capability
-	_, channelCap, err := k.ChannelKeeper.LookupModuleByChannel(ctx, msg.Packet.DestinationPort, msg.Packet.DestinationChannel)
+	_, channelCap, err := k.ChannelKeeper.LookupModuleByChannel(ctx, "transfer", "channel-0")
 	if err != nil {
-		ctx.Logger().Error("receive packet failed", "port-id", msg.Packet.SourcePort, "channel-id", msg.Packet.SourceChannel, "error", errorsmod.Wrap(err, "could not retrieve module from port-id"))
+		ctx.Logger().Error("receive packet failed", "port-id", "transfer", "channel-id", "channel-1", "error", errorsmod.Wrap(err, "could not retrieve module from port-id"))
 		return nil, errorsmod.Wrap(err, "could not retrieve module from port-id")
 	}
 
 	// Call the SendPacket function of the ChannelKeeper
-	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.SourcePort, msg.SourceChannel, msg.TimeoutHeight, msg.TimeoutTimestamp, msg.Packet.GetData()); err != nil {
+	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.source_port, msg.source_channel, msg.timeout_height, msg.timeoutTimestamp, msg.p_data.GetData()); err != nil {
 		ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "error sending packet"))
 		return nil, errorsmod.Wrap(err, "error sending packet")
 	}
