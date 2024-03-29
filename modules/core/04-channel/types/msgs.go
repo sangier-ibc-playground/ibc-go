@@ -292,21 +292,6 @@ func NewMsgSendPacket(
 	}
 }
 
-/*
-func NewMsgSendPacket(
-	source_port string, source_channel string, timeout_height clienttypes.Height, timeout_timestamp uint64, data []byte,
-	signer string,
-) *MsgSendPacket {
-	return &MsgSendPacket{
-		SourcePort:       source_port,
-		SourceChannel:    source_channel,
-		TimeoutHeight:    timeout_height,
-		TimeoutTimestamp: timeout_timestamp,
-		PData:            data,
-		Signer:           signer,
-	}
-}*/
-
 func (msg MsgSendPacket) ValidateBasic() error {
 	if err := host.PortIdentifierValidator(msg.SourcePort); err != nil {
 		return errorsmod.Wrap(err, "invalid source port ID")
@@ -334,14 +319,6 @@ func (msg MsgSendPacket) ValidateBasic() error {
 	return nil
 }
 
-/*
-// GetDataSignBytes returns the base64-encoded bytes used for the
-// data field when signing the packet.
-func (msg MsgSendPacket) GetDataSignBytes() []byte {
-	s := "\"" + base64.StdEncoding.EncodeToString(msg.PData) + "\""
-	return []byte(s)
-}
-*/
 // NewMsgRecvPacket constructs new MsgRecvPacket
 func NewMsgRecvPacket(
 	packet Packet, commitmentProof []byte, proofHeight clienttypes.Height,

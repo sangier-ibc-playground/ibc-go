@@ -450,6 +450,8 @@ func (k Keeper) ChannelCloseConfirm(goCtx context.Context, msg *channeltypes.Msg
 func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacket) (*channeltypes.MsgSendPacketResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	token := msg.Token
+
+	//Disable Signer Verification
 	/*
 		// Validate the signer's address
 		_, err := sdk.AccAddressFromBech32(msg.Signer)
@@ -458,6 +460,7 @@ func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacke
 			return nil, errorsmod.Wrap(err, "invalid address for msg signer")
 		}
 	*/
+	//Retrieve Cap
 	// Lookup module by channel capability
 	_, channelCap, err := k.ChannelKeeper.LookupModuleByChannel(ctx, "transfer", "channel-1")
 	if err != nil {
@@ -465,7 +468,9 @@ func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacke
 		return nil, errorsmod.Wrap(err, "could not retrieve module from port-id")
 	}
 
+	// Retrieve Denom
 	fullDenomPath := token.Denom
+	// Generate Packet Data
 	packetData := types.NewFungibleTokenPacketData(
 		fullDenomPath, token.Amount.String(), msg.Sender, msg.Receiver, msg.Memo,
 	)
