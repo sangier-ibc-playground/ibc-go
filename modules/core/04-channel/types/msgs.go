@@ -41,7 +41,7 @@ var (
 	_ sdk.HasValidateBasic = (*MsgChannelCloseInit)(nil)
 	_ sdk.HasValidateBasic = (*MsgChannelCloseConfirm)(nil)
 	_ sdk.HasValidateBasic = (*MsgRecvPacket)(nil)
-	_ sdk.HasValidateBasic = (*MsgSendPacket)(nil)
+	//_ sdk.HasValidateBasic = (*MsgSendPacket)(nil)
 	_ sdk.HasValidateBasic = (*MsgAcknowledgement)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeout)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeoutOnClose)(nil)
@@ -281,6 +281,7 @@ func NewMsgSendPacket(
 	}
 }
 
+/*
 // MsgSendPacket implements sdk.Msg
 func (msg MsgSendPacket) ValidateBasic() error {
 	//if len(msg.ProofCommitment) == 0 {
@@ -291,15 +292,15 @@ func (msg MsgSendPacket) ValidateBasic() error {
 		return errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "string could not be parsed as address: %v", err)
 	}
 	return msg.Packet.ValidateBasic()
-}
-
+}*/
+/*
 // GetDataSignBytes returns the base64-encoded bytes used for the
 // data field when signing the packet.
 func (msg MsgSendPacket) GetDataSignBytes() []byte {
-	s := "\"" + base64.StdEncoding.EncodeToString(msg.Packet.Data) + "\""
+	s := "\"" + base64.StdEncoding.EncodeToString(msg.PData) + "\""
 	return []byte(s)
 }
-
+*/
 // NewMsgRecvPacket constructs new MsgRecvPacket
 func NewMsgRecvPacket(
 	packet Packet, commitmentProof []byte, proofHeight clienttypes.Height,
