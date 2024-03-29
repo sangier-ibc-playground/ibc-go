@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/base64"
 	"slices"
+	"strings"
 
 	errorsmod "cosmossdk.io/errors"
 
@@ -12,6 +13,11 @@ import (
 	commitmenttypes "github.com/cosmos/ibc-go/v8/modules/core/23-commitment/types"
 	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
 	ibcerrors "github.com/cosmos/ibc-go/v8/modules/core/errors"
+)
+
+const (
+	MaximumReceiverLength = 2048  // maximum length of the receiver address in bytes (value chosen arbitrarily)
+	MaximumMemoLength     = 32768 // maximum length of the memo in bytes (value chosen arbitrarily)
 )
 
 var (
@@ -41,7 +47,7 @@ var (
 	_ sdk.HasValidateBasic = (*MsgChannelCloseInit)(nil)
 	_ sdk.HasValidateBasic = (*MsgChannelCloseConfirm)(nil)
 	_ sdk.HasValidateBasic = (*MsgRecvPacket)(nil)
-	//_ sdk.HasValidateBasic = (*MsgSendPacket)(nil)
+	_ sdk.HasValidateBasic = (*MsgSendPacket)(nil)
 	_ sdk.HasValidateBasic = (*MsgAcknowledgement)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeout)(nil)
 	_ sdk.HasValidateBasic = (*MsgTimeoutOnClose)(nil)
@@ -268,6 +274,26 @@ func (msg MsgChannelCloseConfirm) ValidateBasic() error {
 }
 
 func NewMsgSendPacket(
+	sourcePort, sourceChannel string,
+	token sdk.Coin, sender, receiver string,
+	timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
+	memo string, signer string,
+) *MsgSendPacket {
+	return &MsgSendPacket{
+		SourcePort:       sourcePort,
+		SourceChannel:    sourceChannel,
+		Token:            token,
+		Sender:           sender,
+		Receiver:         receiver,
+		TimeoutHeight:    timeoutHeight,
+		TimeoutTimestamp: timeoutTimestamp,
+		Memo:             memo,
+		Signer:           signer,
+	}
+}
+
+/*
+func NewMsgSendPacket(
 	source_port string, source_channel string, timeout_height clienttypes.Height, timeout_timestamp uint64, data []byte,
 	signer string,
 ) *MsgSendPacket {
@@ -279,20 +305,35 @@ func NewMsgSendPacket(
 		PData:            data,
 		Signer:           signer,
 	}
-}
+}*/
 
-/*
-// MsgSendPacket implements sdk.Msg
 func (msg MsgSendPacket) ValidateBasic() error {
-	//if len(msg.ProofCommitment) == 0 {
-	//	return errorsmod.Wrap(commitmenttypes.ErrInvalidProof, "cannot submit an empty commitment proof")
-	//}
-	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err := host.PortIdentifierValidator(msg.SourcePort); err != nil {
+		return errorsmod.Wrap(err, "invalid source port ID")
+	}
+	if err := host.ChannelIdentifierValidator(msg.SourceChannel); err != nil {
+		return errorsmod.Wrap(err, "invalid source channel ID")
+	}
+	if !msg.Token.IsValid() {
+		return errorsmod.Wrap(ibcerrors.ErrInvalidCoins, msg.Token.String())
+	}
+	if !msg.Token.IsPositive() {
+		return errorsmod.Wrap(ibcerrors.ErrInsufficientFunds, msg.Token.String())
+	}
+
+	_, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "string could not be parsed as address: %v", err)
 	}
-	return msg.Packet.ValidateBasic()
-}*/
+	if strings.TrimSpace(msg.Receiver) == "" {
+		return errorsmod.Wrap(ibcerrors.ErrInvalidAddress, "missing recipient address")
+	}
+	if len(msg.Receiver) > MaximumReceiverLength {
+		return errorsmod.Wrapf(ibcerrors.ErrInvalidAddress, "recipient address must not exceed %d bytes", MaximumReceiverLength)
+	}
+	return nil
+}
+
 /*
 // GetDataSignBytes returns the base64-encoded bytes used for the
 // data field when signing the packet.

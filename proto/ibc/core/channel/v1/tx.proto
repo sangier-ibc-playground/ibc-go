@@ -9,6 +9,7 @@ import "cosmos/msg/v1/msg.proto";
 import "ibc/core/client/v1/client.proto";
 import "ibc/core/channel/v1/channel.proto";
 import "ibc/core/channel/v1/upgrade.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 // Msg defines the ibc/channel Msg service.
 service Msg {
@@ -233,6 +234,33 @@ message MsgRecvPacketResponse {
   ResponseResultType result = 1;
 }
 
+message MsgSendPacket {
+  option (cosmos.msg.v1.signer) = "signer";
+
+  option (gogoproto.goproto_getters) = false;
+
+  // the port on which the packet will be sent
+  string source_port = 1;
+  // the channel by which the packet will be sent
+  string source_channel = 2;
+  // the tokens to be transferred
+  cosmos.base.v1beta1.Coin token = 3 [(gogoproto.nullable) = false];
+  // the sender address
+  string sender = 4;
+  // the recipient address on the destination chain
+  string receiver = 5;
+  // Timeout height relative to the current block height.
+  // The timeout is disabled when set to 0.
+  ibc.core.client.v1.Height timeout_height = 6 [(gogoproto.nullable) = false];
+  // Timeout timestamp in absolute nanoseconds since unix epoch.
+  // The timeout is disabled when set to 0.
+  uint64 timeout_timestamp = 7;
+  // optional memo
+  string memo = 8;
+
+  string signer = 9;
+}
+/*
  // MsgSendPacket process outgoing IBC packet
 message MsgSendPacket {
   option (cosmos.msg.v1.signer) = "signer";
@@ -243,10 +271,10 @@ message MsgSendPacket {
   string source_channel  = 2 ;
   ibc.core.client.v1.Height timeout_height=  3 [(gogoproto.nullable) = false];
   uint64 timeout_timestamp = 4 ;
-  bytes p_data           = 5 ;//[(gogoproto.nullable) = false];
+  Packet                    packet           = 1 [(gogoproto.nullable) = false];
   string signer           = 6;
 }
-
+*/
 // MsgSendPacketResponse defines the Msg/SendPacket response type.
 message MsgSendPacketResponse {
   option (gogoproto.goproto_getters) = false;
