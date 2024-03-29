@@ -464,13 +464,13 @@ func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacke
 	}
 
 	// Call the SendPacket function of the ChannelKeeper
-	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.source_port, msg.source_channel, msg.timeout_height, msg.timeoutTimestamp, msg.p_data.GetData()); err != nil {
+	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.SourcePort, msg.SourceChannel, msg.TimeoutHeight, msg.TimeoutTimestamp, msg.PData); err != nil {
 		ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "error sending packet"))
 		return nil, errorsmod.Wrap(err, "error sending packet")
 	}
 
 	// Log success and return
-	ctx.Logger().Info("packet sent", "source-port", msg.Packet.SourcePort, "source-channel", msg.Packet.SourceChannel, "sequence", msg.Packet.Sequence)
+	ctx.Logger().Info("packet sent", "source-port", msg.SourcePort, "source-channel", msg.SourceChannel)
 	return &channeltypes.MsgSendPacketResponse{}, nil
 }
 
