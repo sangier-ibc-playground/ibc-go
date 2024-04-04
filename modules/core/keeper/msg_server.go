@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	connectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	"github.com/cosmos/ibc-go/v8/modules/core/04-channel/keeper"
@@ -443,6 +444,46 @@ func (k Keeper) ChannelCloseConfirm(goCtx context.Context, msg *channeltypes.Msg
 	ctx.Logger().Info("channel close confirm succeeded", "channel-id", msg.ChannelId, "port-id", msg.PortId)
 
 	return &channeltypes.MsgChannelCloseConfirmResponse{}, nil
+}
+
+// SendPacket defines a rpc handler method for MsgSendPacket.
+func (k Keeper) SendPacket(goCtx context.Context, msg *channeltypes.MsgSendPacket) (*channeltypes.MsgSendPacketResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	token := msg.Token
+
+	//Disable Signer Verification
+	/*
+		// Validate the signer's address
+		_, err := sdk.AccAddressFromBech32(msg.Signer)
+		if err != nil {
+			ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "invalid address for msg signer"))
+			return nil, errorsmod.Wrap(err, "invalid address for msg signer")
+		}
+	*/
+	//Retrieve Cap
+	// Lookup module by channel capability
+	_, channelCap, err := k.ChannelKeeper.LookupModuleByChannel(ctx, "transfer", "channel-1")
+	if err != nil {
+		ctx.Logger().Error("receive packet failed", "port-id", "transfer", "channel-id", "channel-1", "error", errorsmod.Wrap(err, "could not retrieve module from port-id"))
+		return nil, errorsmod.Wrap(err, "could not retrieve module from port-id")
+	}
+
+	// Retrieve Denom
+	fullDenomPath := token.Denom
+	// Generate Packet Data
+	packetData := types.NewFungibleTokenPacketData(
+		fullDenomPath, token.Amount.String(), msg.Sender, msg.Receiver, msg.Memo,
+	)
+
+	// Call the SendPacket function of the ChannelKeeper
+	if _, err := k.ChannelKeeper.SendPacket(ctx, channelCap, msg.SourcePort, msg.SourceChannel, msg.TimeoutHeight, msg.TimeoutTimestamp, packetData.GetBytes()); err != nil {
+		ctx.Logger().Error("send packet failed", "error", errorsmod.Wrap(err, "error sending packet"))
+		return nil, errorsmod.Wrap(err, "error sending packet")
+	}
+
+	// Log success and return
+	ctx.Logger().Info("packet sent", "source-port", msg.SourcePort, "source-channel", msg.SourceChannel)
+	return &channeltypes.MsgSendPacketResponse{}, nil
 }
 
 // RecvPacket defines a rpc handler method for MsgRecvPacket.

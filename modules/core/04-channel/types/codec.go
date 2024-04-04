@@ -17,6 +17,7 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		(*exported.PacketI)(nil),
 		&Packet{},
 	)
+
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgChannelOpenInit{},
@@ -25,6 +26,7 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgChannelOpenConfirm{},
 		&MsgChannelCloseInit{},
 		&MsgChannelCloseConfirm{},
+		&MsgSendPacket{},
 		&MsgRecvPacket{},
 		&MsgAcknowledgement{},
 		&MsgTimeout{},

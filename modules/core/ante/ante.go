@@ -39,6 +39,16 @@ func (rrd RedundantRelayDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simula
 				}
 				packetMsgs++
 
+			case *channeltypes.MsgSendPacket:
+				response, err := rrd.k.SendPacket(ctx, msg)
+				if err != nil {
+					return ctx, err
+				}
+				if response.Result == channeltypes.NOOP {
+					redundancies++
+				}
+				packetMsgs++
+
 			case *channeltypes.MsgAcknowledgement:
 				response, err := rrd.k.Acknowledgement(ctx, msg)
 				if err != nil {
